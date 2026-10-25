@@ -1,15 +1,11 @@
-import Header from './components/Header';
-import Footer from './components/Footer';
+import MainLayout from './layouts/MainLayout';
 import HomePage from './pages/HomePage';
 
-// App: the main component that holds the whole website
 function App() {
   return (
-    <>
-      <Header />
+    <MainLayout>
       <HomePage />
-      <Footer />
-    </>
+    </MainLayout>
   );
 }
 

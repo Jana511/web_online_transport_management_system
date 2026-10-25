@@ -1,0 +1,13 @@
+/* Makes the layout fill the full screen height */
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The main area grows to fill empty space,
+   which pushes the footer to the bottom */
+.layout-main {
+  flex: 1;
+  padding: 32px 0;
+}
