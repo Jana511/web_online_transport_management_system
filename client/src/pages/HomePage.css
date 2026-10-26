@@ -213,6 +213,20 @@
     font-size: 2rem;
   }
 
+  /* Buttons stack and fill the width */
+  .hero-buttons {
+    flex-direction: column;
+  }
+
+  .hero-buttons .btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .hero-card {
+    padding: 20px;
+  }
+
   .features-grid {
     grid-template-columns: 1fr;
   }

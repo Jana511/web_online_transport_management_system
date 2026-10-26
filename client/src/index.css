@@ -87,3 +87,25 @@ button:focus-visible {
   outline: 3px solid var(--color-primary);
   outline-offset: 2px;
 }
+/* ===== Responsive helpers ===== */
+
+/* Images never overflow their container */
+img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Buttons keep their text centred */
+.btn {
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .section {
+    padding: 48px 0;
+  }
+
+  .section-title {
+    font-size: 1.6rem;
+  }
+}

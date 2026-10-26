@@ -1,0 +1,170 @@
+/* ===== Shared styles for Login and Register pages ===== */
+
+.auth-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 56px 16px;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background-color: var(--color-white);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* Register form is a little wider */
+.auth-card-wide {
+  max-width: 560px;
+}
+
+.auth-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.auth-icon {
+  font-size: 2.5rem;
+}
+
+.auth-header h1 {
+  color: var(--color-secondary);
+  font-size: 1.8rem;
+}
+
+.auth-header p {
+  color: var(--color-muted);
+}
+
+/* ===== Form fields ===== */
+.form-group {
+  margin-bottom: 18px;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 6px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #d1d5db;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+/* Yellow glow when the user clicks into a box */
+.form-group input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(245, 183, 0, 0.25);
+}
+
+/* Red border when the field has an error */
+.form-group input.input-error {
+  border-color: #dc2626;
+}
+
+.error-text {
+  display: block;
+  color: #dc2626;
+  font-size: 0.85rem;
+  margin-top: 4px;
+}
+
+.form-hint {
+  display: block;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+/* Two fields side by side (used on the register page) */
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* Password box with a Show/Hide button inside it */
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper input {
+  padding-right: 70px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Full-width button */
+.btn-block {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* Green success message */
+.form-success {
+  background-color: #ecfdf5;
+  color: #047857;
+  border: 1px solid #a7f3d0;
+  border-radius: var(--radius);
+  padding: 12px;
+  margin-bottom: 18px;
+  font-size: 0.95rem;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: 20px;
+  color: var(--color-muted);
+}
+
+.auth-footer a {
+  color: var(--color-secondary);
+  font-weight: 600;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+/* ===== Mobile ===== */
+@media (max-width: 600px) {
+  .auth-page {
+    padding: 24px 12px;
+  }
+
+  .auth-card {
+    padding: 28px 20px;
+    border-radius: 12px;
+  }
+
+  .auth-header h1 {
+    font-size: 1.5rem;
+  }
+
+  /* Side-by-side fields stack on top of each other */
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}
