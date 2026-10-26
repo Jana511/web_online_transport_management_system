@@ -1,0 +1,101 @@
+.navbar {
+  background-color: var(--color-secondary);
+  color: var(--color-white);
+  position: sticky; /* stays at the top while scrolling */
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow);
+}
+
+.navbar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  position: relative;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.logo-highlight {
+  color: var(--color-primary);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.nav-links a {
+  font-weight: 500;
+  opacity: 0.9;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover,
+.nav-links a.active {
+  color: var(--color-primary);
+  opacity: 1;
+}
+
+/* Register button inside the menu */
+.nav-links .nav-btn {
+  padding: 8px 18px;
+  color: var(--color-secondary);
+  opacity: 1;
+}
+
+.nav-links .nav-btn:hover {
+  color: var(--color-secondary);
+}
+
+/* Hamburger button - hidden on big screens */
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--color-white);
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+/* ===== Mobile ===== */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+  }
+
+  /* Menu is hidden until the hamburger is clicked */
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 64px;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    background-color: var(--color-secondary);
+    padding: 8px 16px 16px;
+    box-shadow: var(--shadow);
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-links a {
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .nav-links .nav-btn {
+    margin-top: 12px;
+    text-align: center;
+    border-bottom: none;
+  }
+}

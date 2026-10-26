@@ -1,0 +1,219 @@
+/* ===== Hero ===== */
+.hero {
+  background: linear-gradient(135deg, var(--color-secondary), #2c5282);
+  color: var(--color-white);
+  padding: 80px 0;
+}
+
+.hero-inner {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.hero-badge {
+  display: inline-block;
+  background-color: rgba(245, 183, 0, 0.15);
+  color: var(--color-primary);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.hero-text h1 {
+  font-size: 2.8rem;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+.hero-text h1 span {
+  color: var(--color-primary);
+}
+
+.hero-text p {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 28px;
+}
+
+.hero-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Journey status card */
+.hero-card {
+  background-color: var(--color-white);
+  color: var(--color-text);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.hero-card h3 {
+  color: var(--color-secondary);
+}
+
+.hero-card-student {
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  margin-bottom: 20px;
+}
+
+.journey-list {
+  list-style: none;
+}
+
+.journey-step {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.journey-step:last-child {
+  border-bottom: none;
+}
+
+.journey-step small {
+  display: block;
+  color: var(--color-muted);
+}
+
+.dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.journey-step.done .dot {
+  background-color: #22c55e; /* green = completed */
+}
+
+.journey-step.pending .dot {
+  background-color: var(--color-primary); /* yellow = waiting */
+}
+
+/* ===== Card grids ===== */
+.features-grid,
+.steps-grid,
+.roles-grid {
+  display: grid;
+  gap: 24px;
+}
+
+.features-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.steps-grid,
+.roles-grid {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.feature-card,
+.step-card,
+.role-card {
+  background-color: var(--color-white);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.feature-card:hover,
+.role-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.feature-card h3,
+.step-card h3,
+.role-card h3 {
+  color: var(--color-secondary);
+  margin-bottom: 8px;
+}
+
+.feature-card p,
+.step-card p {
+  color: var(--color-muted);
+}
+
+.feature-icon,
+.role-icon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+/* How it works */
+.section-light {
+  background-color: var(--color-white);
+}
+
+.step-card {
+  text-align: center;
+  background-color: var(--color-bg);
+}
+
+.step-number {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 16px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: var(--color-secondary);
+  font-size: 1.3rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Roles */
+.role-card ul {
+  list-style: none;
+}
+
+.role-card li {
+  padding: 6px 0;
+  color: var(--color-muted);
+}
+
+/* ===== Responsive design ===== */
+
+/* Tablets */
+@media (max-width: 900px) {
+  .hero-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .features-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .steps-grid,
+  .roles-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 600px) {
+  .hero {
+    padding: 48px 0;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+}
