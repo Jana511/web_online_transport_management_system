@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+
+# Environment variables - contain secrets
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Editor and OS files
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
+# Uploaded files
+uploads/
