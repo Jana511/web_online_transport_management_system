@@ -1,5 +1,6 @@
 import express from 'express';
 import cors from 'cors';
+import connectDB from './config/db.js';
 import healthRoutes from './routes/healthRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
@@ -24,17 +25,20 @@ app.get('/', (req, res) => {
   res.send('SchoolRide API is running 🚐');
 });
 
-// All health routes start with /api/health
 app.use('/api/health', healthRoutes);
-
-// All auth routes start with /api/auth
 app.use('/api/auth', authRoutes);
 
 // ===== Error handling (must be AFTER all routes) =====
 app.use(notFound);
 app.use(errorHandler);
 
-// ===== Start the server =====
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT} (${process.env.NODE_ENV || 'development'})`);
-});
+// ===== Start: connect to the database first, then start the server =====
+const startServer = async () => {
+  await connectDB();
+
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT} (${process.env.NODE_ENV || 'development'})`);
+  });
+};
+
+startServer();
