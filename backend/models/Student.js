@@ -59,6 +59,12 @@ const studentSchema = new mongoose.Schema(
       enum: ['pending', 'assigned', 'inactive'],
       default: 'pending',
     },
+        // ===== Which van this student is assigned to (set by admin) =====
+    van: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Van',
+      default: null, // null = not assigned yet
+    },
 
     notes: {
       type: String,
