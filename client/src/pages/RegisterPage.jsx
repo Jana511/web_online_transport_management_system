@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './AuthPages.css';
 
-// Starting (empty) values - also used to clear the form after success
+// Starting (empty) values
 const initialForm = {
   fullName: '',
   email: '',
@@ -12,10 +13,14 @@ const initialForm = {
 };
 
 function RegisterPage() {
+  const { register } = useAuth();
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  const [message, setMessage] = useState('');
+  const [serverError, setServerError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -26,28 +31,24 @@ function RegisterPage() {
   const validate = () => {
     const newErrors = {};
 
-    // Full name: at least 3 characters
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full name is required';
     } else if (formData.fullName.trim().length < 3) {
       newErrors.fullName = 'Name must be at least 3 characters';
     }
 
-    // Email: valid format
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
       newErrors.email = 'Enter a valid email address';
     }
 
-    // Phone: Sri Lankan format - 10 digits starting with 0 (e.g. 0771234567)
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
     } else if (!/^0\d{9}$/.test(formData.phone)) {
       newErrors.phone = 'Enter a 10-digit number starting with 0';
     }
 
-    // Password: at least 8 characters, with a letter and a number
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
@@ -56,7 +57,6 @@ function RegisterPage() {
       newErrors.password = 'Password must contain letters and numbers';
     }
 
-    // Confirm password: must match
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
     } else if (formData.confirmPassword !== formData.password) {
@@ -66,20 +66,23 @@ function RegisterPage() {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setServerError('');
 
     const newErrors = validate();
     setErrors(newErrors);
+    if (Object.keys(newErrors).length > 0) return;
 
-    if (Object.keys(newErrors).length > 0) {
-      setMessage('');
-      return;
+    setLoading(true);
+    try {
+      await register(formData); // only fullName, email, phone, password are sent
+      navigate('/parent'); // new accounts are always parents
+    } catch (error) {
+      setServerError(error.message); // e.g. "An account with this email already exists"
+    } finally {
+      setLoading(false);
     }
-
-    // Day 7: we will send this data to the backend here.
-    setMessage('Registration form is valid! Accounts will be saved after we connect the backend.');
-    setFormData(initialForm); // clear the form
   };
 
   return (
@@ -91,7 +94,7 @@ function RegisterPage() {
           <p>Register to manage your child's school transport</p>
         </div>
 
-        {message && <div className="form-success">{message}</div>}
+        {serverError && <div className="form-error">{serverError}</div>}
 
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
@@ -188,8 +191,8 @@ function RegisterPage() {
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary btn-block">
-            Create Account
+          <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
+            {loading ? 'Creating account...' : 'Create Account'}
           </button>
         </form>
 

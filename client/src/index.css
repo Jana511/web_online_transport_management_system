@@ -1,3 +1,53 @@
+/* ===== SchoolRide global styles ===== */
+
+/* Colour theme - used everywhere in the app */
+:root {
+  --color-primary: #f5b700;       /* school van yellow */
+  --color-primary-dark: #d99e00;
+  --color-secondary: #1e3a5f;     /* navy blue */
+  --color-bg: #f7f8fa;            /* page background */
+  --color-text: #1f2937;          /* main text */
+  --color-muted: #6b7280;         /* grey text */
+  --color-white: #ffffff;
+  --radius: 10px;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* Remove default browser spacing */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+/* Form controls use the same font as the page */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Centers content and limits its width on big screens */
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
 /* ===== Buttons (used on every page) ===== */
 .btn {
   display: inline-block;
@@ -6,6 +56,7 @@
   border: 2px solid transparent;
   font-size: 1rem;
   font-weight: 600;
+  text-align: center;
   cursor: pointer;
   transition: background-color 0.2s, color 0.2s, transform 0.2s;
 }
@@ -55,6 +106,7 @@
 .page {
   padding: 32px 16px;
 }
+
 /* ===== Not found page ===== */
 .not-found {
   text-align: center;
@@ -69,6 +121,7 @@
   color: var(--color-muted);
   margin: 8px 0 24px;
 }
+
 /* ===== Layout polish ===== */
 
 /* Smooth scrolling when clicking Features / How It Works */
@@ -87,17 +140,13 @@ button:focus-visible {
   outline: 3px solid var(--color-primary);
   outline-offset: 2px;
 }
+
 /* ===== Responsive helpers ===== */
 
 /* Images never overflow their container */
 img {
   max-width: 100%;
   display: block;
-}
-
-/* Buttons keep their text centred */
-.btn {
-  text-align: center;
 }
 
 @media (max-width: 600px) {

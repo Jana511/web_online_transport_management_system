@@ -99,3 +99,21 @@
     border-bottom: none;
   }
 }
+
+/* Logged-in user's name */
+.nav-user {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* Logout is a <button>, so give it the same font as links */
+.nav-links button.nav-btn {
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 768px) {
+  .nav-user {
+    padding: 12px 0;
+  }
+}
