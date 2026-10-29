@@ -1,28 +1,26 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { apiRequest } from '../../services/api';
+import { useApi } from '../../hooks/useApi';
+import AdminNav from '../../components/AdminNav';
 import './Dashboard.css';
+import './Manage.css';
 
 function AdminDashboard() {
-  const { user, token, logout } = useAuth();
+  const { user } = useAuth();
+  const request = useApi();
   const [stats, setStats] = useState(null);
   const [error, setError] = useState('');
 
-  // useEffect runs after the page appears - a good place to load data
+  // Load the numbers when the page opens
   useEffect(() => {
-    apiRequest('/admin/stats', { token })
+    request('/admin/stats')
       .then((data) => setStats(data.stats))
-      .catch((err) => {
-        if (err.status === 401) {
-          logout(); // token expired -> log out (ProtectedRoute sends them to login)
-        } else {
-          setError(err.message);
-        }
-      });
-  }, [token, logout]);
+      .catch((err) => setError(err.message));
+  }, [request]);
 
   // Show "..." until the numbers arrive
-  const show = (value) => (stats ? value : '...');
+  const show = (key) => (stats ? stats[key] : '...');
 
   return (
     <section className="container dashboard">
@@ -32,30 +30,50 @@ function AdminDashboard() {
         <p>Here is an overview of the SchoolRide system.</p>
       </div>
 
-      {error && <div className="dashboard-error">{error}</div>}
+      <AdminNav />
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <div className="stat-label">Registered Parents</div>
-          <div className="stat-value">{show(stats?.parents)}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Drivers</div>
-          <div className="stat-value">{show(stats?.drivers)}</div>
+      {error && <div className="alert alert-error">{error}</div>}
+
+      <div className="stats-grid stats-5">
+        <div className={`stat-card ${stats?.pendingRequests > 0 ? 'highlight' : ''}`}>
+          <div className="stat-label">Pending Requests</div>
+          <div className="stat-value">{show('pendingRequests')}</div>
         </div>
         <div className="stat-card">
           <div className="stat-label">Students</div>
-          <div className="stat-value">{show(stats?.students)}</div>
+          <div className="stat-value">{show('students')}</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Parents</div>
+          <div className="stat-value">{show('parents')}</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Drivers</div>
+          <div className="stat-value">{show('drivers')}</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Vans</div>
+          <div className="stat-value">{show('vans')}</div>
         </div>
       </div>
 
-      <div className="panel">
-        <h2>Coming next</h2>
-        <ul>
-          <li>🚐 Manage vans and drivers</li>
-          <li>🗺️ Manage routes and pickup points</li>
-          <li>🪑 Assign students to vans</li>
-        </ul>
+      <div className="quick-links">
+        <Link to="/admin/students" className="quick-link">
+          <h3>🎒 Assign Students</h3>
+          <p>Review van requests and assign students to vans.</p>
+        </Link>
+        <Link to="/admin/vans" className="quick-link">
+          <h3>🚐 Manage Vans</h3>
+          <p>Add vans, set seats, and choose a driver and route.</p>
+        </Link>
+        <Link to="/admin/drivers" className="quick-link">
+          <h3>🧑‍✈️ Manage Drivers</h3>
+          <p>Create driver accounts and control their access.</p>
+        </Link>
+        <Link to="/admin/routes" className="quick-link">
+          <h3>🗺️ Manage Routes</h3>
+          <p>Create routes and set the order of pickup stops.</p>
+        </Link>
       </div>
     </section>
   );
