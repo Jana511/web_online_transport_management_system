@@ -4,17 +4,22 @@ import Route from '../models/Route.js';
 import Student from '../models/Student.js';
 import { createError } from '../utils/createError.js';
 
-// Checks the chosen driver: must be an active driver who does not drive another van
+// Checks the chosen driver: must be an approved, active driver who does not drive another van
 const checkDriver = async (driverId, currentVanId = null) => {
   if (!driverId) return null; // no driver chosen
 
-  const driver = await User.findOne({ _id: driverId, role: 'driver', isActive: true });
+  const driver = await User.findOne({
+    _id: driverId,
+    role: 'driver',
+    isActive: true,
+    isApproved: { $ne: false }, // not waiting for approval
+  });
   if (!driver) {
-    throw createError(400, 'Please choose a valid, active driver');
+    throw createError(400, 'Please choose a valid, approved and active driver');
   }
 
   const query = { driver: driverId };
-  if (currentVanId) query._id = { $ne: currentVanId }; // ignore the van being edited
+  if (currentVanId) query._id = { $ne: currentVanId };
   const otherVan = await Van.findOne(query);
   if (otherVan) {
     throw createError(409, `This driver is already assigned to van ${otherVan.vanNumber}`);
@@ -25,7 +30,7 @@ const checkDriver = async (driverId, currentVanId = null) => {
 
 // Checks the chosen route exists
 const checkRoute = async (routeId) => {
-  if (!routeId) return null; // no route chosen
+  if (!routeId) return null;
 
   const route = await Route.findById(routeId);
   if (!route) {
@@ -35,14 +40,12 @@ const checkRoute = async (routeId) => {
 };
 
 // GET /api/vans  (admin only)
-// Lists all vans with their driver, route and number of assigned students
 export const getVans = async (req, res) => {
   const vans = await Van.find()
-    .populate('driver', 'fullName phone') // replace driver ID with name + phone
-    .populate('route', 'name school') // replace route ID with name + school
+    .populate('driver', 'fullName phone')
+    .populate('route', 'name school')
     .sort({ vanNumber: 1 });
 
-  // Count students in each van
   const counts = await Promise.all(
     vans.map((van) => Student.countDocuments({ van: van._id }))
   );
@@ -84,7 +87,6 @@ export const updateVan = async (req, res) => {
 
   const { vanNumber, model, capacity, driver, route, isActive } = req.body || {};
 
-  // Capacity cannot go below the number of students already in the van
   if (capacity !== undefined) {
     const assigned = await Student.countDocuments({ van: van._id });
     if (Number(capacity) < assigned) {
@@ -99,7 +101,7 @@ export const updateVan = async (req, res) => {
   if (route !== undefined) van.route = await checkRoute(route);
   if (isActive !== undefined) van.isActive = Boolean(isActive);
 
-  await van.save(); // runs the model's validation rules
+  await van.save();
 
   res.status(200).json({ success: true, message: 'Van updated', van });
 };
@@ -111,7 +113,6 @@ export const deleteVan = async (req, res) => {
     throw createError(404, 'Van not found');
   }
 
-  // Do not delete a van that still has students
   const assigned = await Student.countDocuments({ van: van._id });
   if (assigned > 0) {
     throw createError(400, `Remove the ${assigned} assigned student(s) from this van first`);

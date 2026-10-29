@@ -26,25 +26,28 @@ export function AuthProvider({ children }) {
     setUser(data.user);
   };
 
-  const login = async (email, password) => {
+  // role = which login tab was used ("parent", "driver" or "admin")
+  const login = async (email, password, role) => {
     const data = await apiRequest('/auth/login', {
       method: 'POST',
-      body: { email, password },
+      body: { email, password, role },
     });
     saveSession(data);
     return data.user;
   };
 
-  const register = async ({ fullName, email, phone, password }) => {
+  // role = "parent" or "driver". Drivers get no token until the admin approves them.
+  const register = async ({ fullName, email, phone, password, role }) => {
     const data = await apiRequest('/auth/register', {
       method: 'POST',
-      body: { fullName, email, phone, password },
+      body: { fullName, email, phone, password, role },
     });
-    saveSession(data);
-    return data.user;
+    if (data.token) {
+      saveSession(data); // parents are logged in straight away
+    }
+    return data; // { message, user, token? }
   };
 
-  // useCallback keeps the same function between renders
   const logout = useCallback(() => {
     localStorage.removeItem('schoolride_token');
     localStorage.removeItem('schoolride_user');
@@ -59,6 +62,5 @@ export function AuthProvider({ children }) {
   );
 }
 
-// Any component can call useAuth() to get the user, token, login, register and logout
 // eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

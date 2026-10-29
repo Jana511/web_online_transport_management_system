@@ -7,15 +7,15 @@ const userSchema = new mongoose.Schema(
     fullName: {
       type: String,
       required: [true, 'Full name is required'],
-      trim: true, // removes spaces at the start and end
+      trim: true,
       minlength: [3, 'Name must be at least 3 characters'],
       maxlength: [100, 'Name cannot be longer than 100 characters'],
     },
     email: {
       type: String,
       required: [true, 'Email is required'],
-      unique: true, // no two users can have the same email
-      lowercase: true, // "Kamala@Example.com" is saved as "kamala@example.com"
+      unique: true,
+      lowercase: true,
       trim: true,
       match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email address'],
     },
@@ -33,12 +33,17 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'parent', 'driver'], // only these three values are allowed
+      enum: ['admin', 'parent', 'driver'],
       default: 'parent',
     },
     isActive: {
       type: Boolean,
       default: true, // admin can deactivate an account instead of deleting it
+    },
+    // Drivers who register themselves start as false until the admin approves them
+    isApproved: {
+      type: Boolean,
+      default: true,
     },
   },
   {
@@ -47,9 +52,7 @@ const userSchema = new mongoose.Schema(
 );
 
 // ===== Hash the password before saving =====
-// Runs automatically every time a user is saved
 userSchema.pre('save', async function () {
-  // Only hash if the password is new or was changed
   if (!this.isModified('password')) return;
 
   const salt = await bcrypt.genSalt(10);
@@ -57,7 +60,6 @@ userSchema.pre('save', async function () {
 });
 
 // ===== Check a password at login =====
-// Usage: const isMatch = await user.matchPassword('typed password');
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return bcrypt.compare(enteredPassword, this.password);
 };

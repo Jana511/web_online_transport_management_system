@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useApi } from '../../hooks/useApi';
+import DriverNav from '../../components/DriverNav';
 import { tripStatusLabels, formatTime } from '../../utils/tripStatus';
 import './Dashboard.css';
 import './Manage.css';
@@ -88,7 +89,7 @@ function DriverDashboard() {
         <h1>Welcome, {user.fullName}</h1>
         <p>Update each student's journey as it happens.</p>
       </div>
-
+<DriverNav />
       {message.text && <div className={`alert alert-${message.type}`}>{message.text}</div>}
 
       {!van ? (

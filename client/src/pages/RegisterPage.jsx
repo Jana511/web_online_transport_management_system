@@ -1,9 +1,24 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './AuthPages.css';
 
-// Starting (empty) values
+// Text and icon for each account type
+const roleConfig = {
+  parent: {
+    icon: '👨‍👩‍👧',
+    title: 'Create a Parent Account',
+    subtitle: "Register to manage your child's school transport",
+    button: 'Create Parent Account',
+  },
+  driver: {
+    icon: '🧑‍✈️',
+    title: 'Register as a Driver',
+    subtitle: 'Your account will be active after the administrator approves it',
+    button: 'Submit Driver Registration',
+  },
+};
+
 const initialForm = {
   fullName: '',
   email: '',
@@ -15,12 +30,28 @@ const initialForm = {
 function RegisterPage() {
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
+  // /register?type=driver opens on the Driver tab
+  const [role, setRole] = useState(searchParams.get('type') === 'driver' ? 'driver' : 'parent');
   const [formData, setFormData] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [serverError, setServerError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const config = roleConfig[role];
+
+  // Switch account type and start with a clean form
+  const switchRole = (newRole) => {
+    setRole(newRole);
+    setFormData(initialForm);
+    setErrors({});
+    setServerError('');
+    setSuccessMessage('');
+    setShowPassword(false);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -69,6 +100,7 @@ function RegisterPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError('');
+    setSuccessMessage('');
 
     const newErrors = validate();
     setErrors(newErrors);
@@ -76,8 +108,15 @@ function RegisterPage() {
 
     setLoading(true);
     try {
-      await register(formData); // only fullName, email, phone, password are sent
-      navigate('/parent'); // new accounts are always parents
+      const data = await register({ ...formData, role });
+
+      if (role === 'parent') {
+        navigate('/parent'); // parents are logged in straight away
+      } else {
+        // drivers must wait for approval - show the message and clear the form
+        setSuccessMessage(data.message);
+        setFormData(initialForm);
+      }
     } catch (error) {
       setServerError(error.message); // e.g. "An account with this email already exists"
     } finally {
@@ -87,14 +126,35 @@ function RegisterPage() {
 
   return (
     <section className="auth-page">
-      <div className="auth-card auth-card-wide">
+      <div className={`auth-card auth-card-wide auth-card-${role}`}>
+        {/* ===== Parent / Driver tabs ===== */}
+        <div className="login-tabs" role="group" aria-label="Choose account type">
+          <button
+            type="button"
+            className={`login-tab ${role === 'parent' ? 'active' : ''}`}
+            aria-pressed={role === 'parent'}
+            onClick={() => switchRole('parent')}
+          >
+            👨‍👩‍👧 Parent
+          </button>
+          <button
+            type="button"
+            className={`login-tab ${role === 'driver' ? 'active' : ''}`}
+            aria-pressed={role === 'driver'}
+            onClick={() => switchRole('driver')}
+          >
+            🧑‍✈️ Driver
+          </button>
+        </div>
+
         <div className="auth-header">
-          <div className="auth-icon">👨‍👩‍👧</div>
-          <h1>Create a Parent Account</h1>
-          <p>Register to manage your child's school transport</p>
+          <div className="auth-icon">{config.icon}</div>
+          <h1>{config.title}</h1>
+          <p>{config.subtitle}</p>
         </div>
 
         {serverError && <div className="form-error">{serverError}</div>}
+        {successMessage && <div className="form-success">{successMessage}</div>}
 
         <form onSubmit={handleSubmit} noValidate>
           <div className="form-group">
@@ -103,7 +163,7 @@ function RegisterPage() {
               type="text"
               id="fullName"
               name="fullName"
-              placeholder="e.g. Kamala Perera"
+              placeholder={role === 'driver' ? 'e.g. Sunil Fernando' : 'e.g. Kamala Perera'}
               value={formData.fullName}
               onChange={handleChange}
               className={errors.fullName ? 'input-error' : ''}
@@ -158,11 +218,7 @@ function RegisterPage() {
                   className={errors.password ? 'input-error' : ''}
                   autoComplete="new-password"
                 />
-                <button
-                  type="button"
-                  className="toggle-password"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
+                <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? 'Hide' : 'Show'}
                 </button>
               </div>
@@ -185,22 +241,17 @@ function RegisterPage() {
                 className={errors.confirmPassword ? 'input-error' : ''}
                 autoComplete="new-password"
               />
-              {errors.confirmPassword && (
-                <span className="error-text">{errors.confirmPassword}</span>
-              )}
+              {errors.confirmPassword && <span className="error-text">{errors.confirmPassword}</span>}
             </div>
           </div>
 
           <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-            {loading ? 'Creating account...' : 'Create Account'}
+            {loading ? 'Please wait...' : config.button}
           </button>
         </form>
 
         <p className="auth-footer">
           Already have an account? <Link to="/login">Log in</Link>
-        </p>
-        <p className="auth-footer">
-          Drivers: your account is created by the SchoolRide administrator.
         </p>
       </div>
     </section>

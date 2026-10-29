@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useApi } from '../../hooks/useApi';
+import ParentNav from '../../components/ParentNav';
 import { tripStatusLabels, formatTime } from '../../utils/tripStatus';
 import './Dashboard.css';
 import './Manage.css';
@@ -93,7 +94,7 @@ function ParentDashboard() {
         <h1>Welcome, {user.fullName}</h1>
         <p>Manage your children's school transport and follow today's journey.</p>
       </div>
-
+<ParentNav />
       {message.text && <div className={`alert alert-${message.type}`}>{message.text}</div>}
 
       {/* ===== Add child form ===== */}

@@ -22,15 +22,14 @@ export const protect = async (req, res, next) => {
     throw createError(401, 'Your session is invalid or has expired. Please log in again.');
   }
 
-  // Make sure the user still exists and is active
+  // Make sure the user still exists, is active and is approved
   const user = await User.findById(decoded.id);
-  if (!user || !user.isActive) {
+  if (!user || !user.isActive || !user.isApproved) {
     throw createError(401, 'This account is no longer available. Please log in again.');
   }
 
-  // Save the user on the request so controllers can use req.user
   req.user = user;
-  next(); // continue to the next middleware or controller
+  next();
 };
 
 // ===== authorize =====

@@ -1,18 +1,54 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import './AuthPages.css';
 import { getDashboardPath } from '../utils/roles';
+import './AuthPages.css';
+
+// Text and icon for each login type
+const roleConfig = {
+  parent: {
+    icon: '👨‍👩‍👧',
+    title: 'Parent Login',
+    subtitle: "Log in to follow your child's school journey",
+    button: 'Log In as Parent',
+  },
+  driver: {
+    icon: '🧑‍✈️',
+    title: 'Driver Login',
+    subtitle: "Log in to view today's pickup list",
+    button: 'Log In as Driver',
+  },
+  admin: {
+    icon: '🛠️',
+    title: 'Administrator Login',
+    subtitle: 'Log in to manage the SchoolRide system',
+    button: 'Log In as Administrator',
+  },
+};
+
+const emptyForm = { email: '', password: '' };
 
 function LoginPage() {
   const { login } = useAuth();
-  const navigate = useNavigate(); // lets us move to another page in code
+  const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [role, setRole] = useState('parent');
+  const [formData, setFormData] = useState(emptyForm);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
-  const [serverError, setServerError] = useState(''); // error from the backend
-  const [loading, setLoading] = useState(false); // true while waiting for the server
+  const [serverError, setServerError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const config = roleConfig[role];
+
+  // Switch login type and start with a clean form
+  const switchRole = (newRole) => {
+    setRole(newRole);
+    setFormData(emptyForm);
+    setErrors({});
+    setServerError('');
+    setShowPassword(false);
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,7 +72,6 @@ function LoginPage() {
     return newErrors;
   };
 
-  // async because we wait for the backend's reply
   const handleSubmit = async (e) => {
     e.preventDefault();
     setServerError('');
@@ -47,22 +82,44 @@ function LoginPage() {
 
     setLoading(true);
     try {
-      const loggedInUser = await login(formData.email, formData.password);
-navigate(getDashboardPath(loggedInUser.role));
+      const loggedInUser = await login(formData.email, formData.password, role);
+      navigate(getDashboardPath(loggedInUser.role));
     } catch (error) {
-      setServerError(error.message); // e.g. "Invalid email or password"
+      setServerError(error.message);
     } finally {
-      setLoading(false); // runs whether login worked or failed
+      setLoading(false);
     }
   };
 
   return (
     <section className="auth-page">
-      <div className="auth-card">
+      <div className={`auth-card auth-card-${role}`}>
+        {/* ===== Parent / Driver tabs (hidden for admin) ===== */}
+        {role !== 'admin' && (
+          <div className="login-tabs" role="group" aria-label="Choose login type">
+            <button
+              type="button"
+              className={`login-tab ${role === 'parent' ? 'active' : ''}`}
+              aria-pressed={role === 'parent'}
+              onClick={() => switchRole('parent')}
+            >
+              👨‍👩‍👧 Parent
+            </button>
+            <button
+              type="button"
+              className={`login-tab ${role === 'driver' ? 'active' : ''}`}
+              aria-pressed={role === 'driver'}
+              onClick={() => switchRole('driver')}
+            >
+              🧑‍✈️ Driver
+            </button>
+          </div>
+        )}
+
         <div className="auth-header">
-          <div className="auth-icon">🚐</div>
-          <h1>Welcome Back</h1>
-          <p>Log in to your SchoolRide account</p>
+          <div className="auth-icon">{config.icon}</div>
+          <h1>{config.title}</h1>
+          <p>{config.subtitle}</p>
         </div>
 
         {serverError && <div className="form-error">{serverError}</div>}
@@ -96,11 +153,7 @@ navigate(getDashboardPath(loggedInUser.role));
                 className={errors.password ? 'input-error' : ''}
                 autoComplete="current-password"
               />
-              <button
-                type="button"
-                className="toggle-password"
-                onClick={() => setShowPassword(!showPassword)}
-              >
+              <button type="button" className="toggle-password" onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? 'Hide' : 'Show'}
               </button>
             </div>
@@ -108,12 +161,32 @@ navigate(getDashboardPath(loggedInUser.role));
           </div>
 
           <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
-            {loading ? 'Logging in...' : 'Log In'}
+            {loading ? 'Logging in...' : config.button}
           </button>
         </form>
 
+        {/* ===== Different footer for each login type ===== */}
+        {role === 'parent' && (
+          <p className="auth-footer">
+            Don't have an account? <Link to="/register">Register as a parent</Link>
+          </p>
+        )}
+        {role === 'driver' && (
+          <p className="auth-footer">
+            New driver? <Link to="/register?type=driver">Register as a driver</Link>
+          </p>
+        )}
+
         <p className="auth-footer">
-          Don't have an account? <Link to="/register">Register as a parent</Link>
+          {role === 'admin' ? (
+            <button type="button" className="link-button" onClick={() => switchRole('parent')}>
+              ← Back to parent / driver login
+            </button>
+          ) : (
+            <button type="button" className="link-button" onClick={() => switchRole('admin')}>
+              Administrator login
+            </button>
+          )}
         </p>
       </div>
     </section>

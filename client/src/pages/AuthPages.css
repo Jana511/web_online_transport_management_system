@@ -186,3 +186,63 @@
   cursor: not-allowed;
   transform: none;
 }
+/* ===== Parent / Driver tabs on the login page ===== */
+.login-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  background-color: var(--color-bg);
+  padding: 6px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+
+.login-tab {
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.login-tab:hover {
+  color: var(--color-secondary);
+}
+
+/* The selected tab looks raised */
+.login-tab.active {
+  background-color: var(--color-white);
+  color: var(--color-secondary);
+  box-shadow: var(--shadow);
+}
+
+/* ===== Coloured top border for each login type ===== */
+.auth-card-parent {
+  border-top: 5px solid var(--color-primary);
+}
+
+.auth-card-driver {
+  border-top: 5px solid var(--color-secondary);
+}
+
+.auth-card-admin {
+  border-top: 5px solid #dc2626;
+}
+
+/* Small, quiet "Administrator login" / "Back" link-style button */
+.link-button {
+  background: none;
+  border: none;
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.link-button:hover {
+  color: var(--color-secondary);
+}

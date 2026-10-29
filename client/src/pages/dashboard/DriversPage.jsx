@@ -27,11 +27,24 @@ function DriversPage() {
     loadDrivers();
   }, [loadDrivers]);
 
+  const pendingCount = drivers.filter((driver) => !driver.isApproved).length;
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // CREATE: add a new driver
+  // Helper: run an action, show its message, then reload the table
+  const runAction = async (endpoint, options) => {
+    try {
+      const data = await request(endpoint, options);
+      setMessage({ type: 'success', text: data.message });
+      loadDrivers();
+    } catch (err) {
+      setMessage({ type: 'error', text: err.message });
+    }
+  };
+
+  // CREATE: admin adds a driver (approved immediately)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -42,7 +55,7 @@ function DriversPage() {
         text: `${data.message} for ${data.driver.fullName}. Share the login details with the driver privately.`,
       });
       setForm(emptyForm);
-      loadDrivers(); // refresh the table
+      loadDrivers();
     } catch (err) {
       setMessage({ type: 'error', text: err.message });
     } finally {
@@ -50,31 +63,36 @@ function DriversPage() {
     }
   };
 
-  // UPDATE: activate or deactivate a driver
-  const toggleStatus = async (driver) => {
-    try {
-      const data = await request(`/admin/drivers/${driver._id}/status`, {
-        method: 'PATCH',
-        body: { isActive: !driver.isActive },
-      });
-      setMessage({ type: 'success', text: data.message });
-      loadDrivers();
-    } catch (err) {
-      setMessage({ type: 'error', text: err.message });
-    }
+  // UPDATE: approve a driver who registered themselves
+  const approveDriver = (driver) => {
+    if (!window.confirm(`Approve ${driver.fullName} as a driver? They will be able to log in.`)) return;
+    runAction(`/admin/drivers/${driver._id}/approve`, { method: 'PATCH' });
   };
+
+  // UPDATE: activate or deactivate an approved driver
+  const toggleStatus = (driver) =>
+    runAction(`/admin/drivers/${driver._id}/status`, {
+      method: 'PATCH',
+      body: { isActive: !driver.isActive },
+    });
 
   return (
     <section className="container dashboard">
       <div className="dashboard-header">
         <span className="role-badge">Administrator</span>
         <h1>Drivers</h1>
-        <p>Create driver accounts and manage their access.</p>
+        <p>Approve driver registrations, create driver accounts and manage their access.</p>
       </div>
 
       <AdminNav />
 
       {message.text && <div className={`alert alert-${message.type}`}>{message.text}</div>}
+
+      {pendingCount > 0 && (
+        <div className="alert alert-warning">
+          🔔 {pendingCount} driver registration(s) waiting for your approval. Check their details before approving.
+        </div>
+      )}
 
       {/* ===== Add driver form ===== */}
       <form className="form-card" onSubmit={handleSubmit}>
@@ -111,7 +129,7 @@ function DriversPage() {
         </div>
 
         {drivers.length === 0 ? (
-          <p className="empty-state">No drivers yet. Add one above.</p>
+          <p className="empty-state">No drivers yet.</p>
         ) : (
           <div className="table-scroll">
             <table className="data-table">
@@ -127,25 +145,38 @@ function DriversPage() {
               <tbody>
                 {drivers.map((driver) => (
                   <tr key={driver._id}>
-                    <td><strong>{driver.fullName}</strong></td>
+                    <td>
+                      <strong>{driver.fullName}</strong>
+                      <small>Joined {new Date(driver.createdAt).toLocaleDateString()}</small>
+                    </td>
                     <td>
                       {driver.email}
                       <small>{driver.phone}</small>
                     </td>
                     <td>{driver.vanNumber || '—'}</td>
                     <td>
-                      <span className={`badge ${driver.isActive ? 'badge-active' : 'badge-inactive'}`}>
-                        {driver.isActive ? 'Active' : 'Inactive'}
-                      </span>
+                      {!driver.isApproved ? (
+                        <span className="badge badge-pending">Pending approval</span>
+                      ) : (
+                        <span className={`badge ${driver.isActive ? 'badge-active' : 'badge-inactive'}`}>
+                          {driver.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                      )}
                     </td>
                     <td>
-                      <button
-                        type="button"
-                        className={`btn btn-sm ${driver.isActive ? 'btn-light' : 'btn-primary'}`}
-                        onClick={() => toggleStatus(driver)}
-                      >
-                        {driver.isActive ? 'Deactivate' : 'Activate'}
-                      </button>
+                      {!driver.isApproved ? (
+                        <button type="button" className="btn btn-sm btn-primary" onClick={() => approveDriver(driver)}>
+                          ✅ Approve
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className={`btn btn-sm ${driver.isActive ? 'btn-light' : 'btn-primary'}`}
+                          onClick={() => toggleStatus(driver)}
+                        >
+                          {driver.isActive ? 'Deactivate' : 'Activate'}
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

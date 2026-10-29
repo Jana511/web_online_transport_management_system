@@ -12,9 +12,16 @@ import DriversPage from './pages/dashboard/DriversPage';
 import RoutesPage from './pages/dashboard/RoutesPage';
 import VansPage from './pages/dashboard/VansPage';
 import StudentsPage from './pages/dashboard/StudentsPage';
+import PaymentsPage from './pages/dashboard/PaymentsPage';
+import ParentPaymentsPage from './pages/dashboard/ParentPaymentsPage';
+import ReportsPage from './pages/dashboard/ReportsPage';
+import ParentReportsPage from './pages/dashboard/ParentReportsPage';
+import DriverReportsPage from './pages/dashboard/DriverReportsPage';
 
-// Wraps a page so only admins can open it
+// Helpers so we don't repeat <ProtectedRoute ...> many times
 const adminOnly = (page) => <ProtectedRoute allowedRoles={['admin']}>{page}</ProtectedRoute>;
+const parentOnly = (page) => <ProtectedRoute allowedRoles={['parent']}>{page}</ProtectedRoute>;
+const driverOnly = (page) => <ProtectedRoute allowedRoles={['driver']}>{page}</ProtectedRoute>;
 
 // App: decides which page to show for each address
 function App() {
@@ -32,24 +39,17 @@ function App() {
         <Route path="/admin/vans" element={adminOnly(<VansPage />)} />
         <Route path="/admin/drivers" element={adminOnly(<DriversPage />)} />
         <Route path="/admin/routes" element={adminOnly(<RoutesPage />)} />
+        <Route path="/admin/payments" element={adminOnly(<PaymentsPage />)} />
+        <Route path="/admin/reports" element={adminOnly(<ReportsPage />)} />
 
-        {/* Parent and driver pages */}
-        <Route
-          path="/parent"
-          element={
-            <ProtectedRoute allowedRoles={['parent']}>
-              <ParentDashboard />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/driver"
-          element={
-            <ProtectedRoute allowedRoles={['driver']}>
-              <DriverDashboard />
-            </ProtectedRoute>
-          }
-        />
+        {/* Parent pages */}
+        <Route path="/parent" element={parentOnly(<ParentDashboard />)} />
+        <Route path="/parent/payments" element={parentOnly(<ParentPaymentsPage />)} />
+        <Route path="/parent/reports" element={parentOnly(<ParentReportsPage />)} />
+
+        {/* Driver pages */}
+        <Route path="/driver" element={driverOnly(<DriverDashboard />)} />
+        <Route path="/driver/reports" element={driverOnly(<DriverReportsPage />)} />
 
         {/* "*" means any other address */}
         <Route path="*" element={<NotFoundPage />} />

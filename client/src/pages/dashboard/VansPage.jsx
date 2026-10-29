@@ -36,7 +36,9 @@ function VansPage() {
   }, [loadData]);
 
   // Only active drivers who do not already drive a van can be chosen
-  const availableDrivers = drivers.filter((driver) => driver.isActive && !driver.vanNumber);
+    const availableDrivers = drivers.filter(
+    (driver) => driver.isActive && driver.isApproved !== false && !driver.vanNumber
+  );
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });

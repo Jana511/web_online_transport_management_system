@@ -7,6 +7,8 @@ const links = [
   { to: '/admin/vans', label: '🚐 Vans' },
   { to: '/admin/drivers', label: '🧑‍✈️ Drivers' },
   { to: '/admin/routes', label: '🗺️ Routes' },
+  { to: '/admin/payments', label: '💳 Payments' },
+  { to: '/admin/reports', label: '🚨 Reports' },
 ];
 
 function AdminNav() {

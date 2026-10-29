@@ -9,6 +9,8 @@ import routeRoutes from './routes/routeRoutes.js';
 import studentRoutes from './routes/studentRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import tripRoutes from './routes/tripRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
 
 // Create the Express application
 const app = express();
@@ -36,6 +38,8 @@ app.use('/api/vans', vanRoutes);
 app.use('/api/routes', routeRoutes);
 app.use('/api/students', studentRoutes);
 app.use('/api/trips', tripRoutes);
+app.use('/api/payments', paymentRoutes);
+app.use('/api/reports', reportRoutes);
 
 // ===== Error handling (must be AFTER all routes) =====
 app.use(notFound);
